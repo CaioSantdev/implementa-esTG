@@ -2,7 +2,7 @@
 from Grafo import Grafo
 from arquivo import lerMatrizesArquivo, escolherMatriz
 
-arquivo = r"c:\Users\Caio\Desktop\TG\Implementaçoes\bfs\Programa\grafo.txt"
+arquivo = r"/home/caio/Documentos/implementa-esTG/bfs/Programa/grafo.txt"
 print(arquivo)
 matrizes = lerMatrizesArquivo(arquivo)
 

@@ -2,87 +2,88 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 # Inicializando a Classe de Grafo
-class Graph:
+class Grafo:
     def __init__(self):
-        self.graph = []
-        self.nodes = set()
-        self.MST = []
+        self.grafo = []
+        self.nos = set()
+        self.AGM = []  # Árvores Geradora Mínima
 
-    def addEdge(self, s, d, w):
-        self.graph.append((s, d, w))
-        self.nodes.add(s)
-        self.nodes.add(d)
+    def adicionarAresta(self, s, d, p):
+        self.grafo.append((s, d, p))
+        self.nos.add(s)
+        self.nos.add(d)
 
-    def printGraph(self, edges):
+    def imprimirGrafo(self, arestas):
         G = nx.Graph()
-        G.add_weighted_edges_from(edges)
+        G.add_weighted_edges_from(arestas)
         pos = nx.spring_layout(G)
         nx.draw(G, pos, with_labels=True, font_weight='bold')
-        edge_weight = nx.get_edge_attributes(G, 'weight')
-        nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_weight)
+        pesos_arestas = nx.get_edge_attributes(G, 'weight')
+        nx.draw_networkx_edge_labels(G, pos, edge_labels=pesos_arestas)
         plt.show()
 
-    def printMST(self, result):
+    def imprimirAGM(self, resultado):
         G = nx.Graph()
-        G.add_weighted_edges_from(result)
+        G.add_weighted_edges_from(resultado)
         pos = nx.spring_layout(G)
         nx.draw(G, pos, with_labels=True, font_weight='bold')
-        edge_weight = nx.get_edge_attributes(G, 'weight')
-        nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_weight)
-        plt.title('Minimum Spanning Tree (Kruskal)')
+        pesos_arestas = nx.get_edge_attributes(G, 'weight')
+        nx.draw_networkx_edge_labels(G, pos, edge_labels=pesos_arestas)
+        plt.title('Árvore Geradora Mínima (Kruskal)')
         plt.show()
     
-    def kruskalAlgo(self):
-        ds = DisjointSet(self.nodes)
-        self.graph = sorted(self.graph, key=lambda item: item[2])
+    def algoritmoKruskal(self):
+        cj = ConjuntoDisjunto(self.nos)
+        self.grafo = sorted(self.grafo, key=lambda item: item[2])
         e = 0
-        for edge in self.graph:
-            s, d, w = edge
-            x = ds.find(s)
-            y = ds.find(d)
+        for aresta in self.grafo:
+            s, d, p = aresta
+            x = cj.encontrar(s)
+            y = cj.encontrar(d)
             if x != y:
                 e += 1
-                self.MST.append((s, d, w))
-                ds.union(x, y)
-                if e == len(self.nodes) - 1:
+                self.AGM.append((s, d, p))
+                cj.unir(x, y)
+                if e == len(self.nos) - 1:
                     break
-        self.printMST(self.MST)
+        self.imprimirAGM(self.AGM)
 
 # Implementando a estrutura de dados Conjunto Disjunto e suas funções
-class DisjointSet:
+class ConjuntoDisjunto:
     def __init__(self, vertices):
-        self.parent = {v: v for v in vertices}
+        self.pai = {v: v for v in vertices}
         self.rank = {v: 0 for v in vertices}
     
-    def find(self, item):
-        if self.parent[item] != item:
-            self.parent[item] = self.find(self.parent[item])
-        return self.parent[item]
+    def encontrar(self, item):
+        if self.pai[item] != item:
+            self.pai[item] = self.encontrar(self.pai[item])
+        return self.pai[item]
     
-    def union(self, x, y):
-        xroot = self.find(x)
-        yroot = self.find(y)
-        if self.rank[xroot] < self.rank[yroot]:
-            self.parent[xroot] = yroot
-        elif self.rank[xroot] > self.rank[yroot]:
-            self.parent[yroot] = xroot
+    def unir(self, x, y):
+        raiz_x = self.encontrar(x)
+        raiz_y = self.encontrar(y)
+        if self.rank[raiz_x] < self.rank[raiz_y]:
+            self.pai[raiz_x] = raiz_y
+        elif self.rank[raiz_x] > self.rank[raiz_y]:
+            self.pai[raiz_y] = raiz_x
         else:
-            self.parent[yroot] = xroot
-            self.rank[xroot] += 1
+            self.pai[raiz_y] = raiz_x
+            self.rank[raiz_x] += 1
 
-g = Graph()
-   
-g.addEdge('B', 'C', 1)
-g.addEdge('A', 'C', 2)
-g.addEdge('D', 'F', 2)
-g.addEdge('A', 'B', 4)
-g.addEdge('B', 'E', 4)
-g.addEdge('E', 'C', 5)
-g.addEdge('C', 'F', 6)
-g.addEdge('A', 'D', 6)
-g.addEdge('C', 'D', 7)
-g.addEdge('E', 'F', 7)
-g.addEdge('B', 'D', 9)
+# Criação do grafo e adição das arestas
+g = Grafo()
+g.adicionarAresta('B', 'C', 1)
+g.adicionarAresta('A', 'C', 2)
+g.adicionarAresta('D', 'F', 2)
+g.adicionarAresta('A', 'B', 4)
+g.adicionarAresta('B', 'E', 4)
+g.adicionarAresta('E', 'C', 5)
+g.adicionarAresta('C', 'F', 6)
+g.adicionarAresta('A', 'D', 6)
+g.adicionarAresta('C', 'D', 7)
+g.adicionarAresta('E', 'F', 7)
+g.adicionarAresta('B', 'D', 9)
 
-g.printGraph(g.graph)
-g.kruskalAlgo()
+# Impressão do grafo original e da AGM
+g.imprimirGrafo(g.grafo)
+g.algoritmoKruskal()
